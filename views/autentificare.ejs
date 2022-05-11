@@ -1,0 +1,11 @@
+<% if(err != null ){ %>
+<%= err %>    
+<% } %>
+
+<form action = "/verificare-autentificare" method = "post">
+    <label> Nume: </label>
+    <input type = "text" name = "name"> <br>
+    <label> Parola: </label>
+    <input type = "password" name = "password"> <br>
+    <input type = "submit" value = "Submit">
+</form>

@@ -1,8 +1,10 @@
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const bodyParser = require('body-parser')
+const cookieParser=require('cookie-parser');
 
 const app = express();
+app.use(cookieParser())
 
 const port = 6789;
 
@@ -20,7 +22,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // la accesarea din browser adresei http://localhost:6789/ se va returna textul 'Hello World'
 // proprietățile obiectului Request - req - https://expressjs.com/en/api.html#req
 // proprietățile obiectului Response - res - https://expressjs.com/en/api.html#res
-app.get('/', (req, res) => res.send('Hello World'));
+app.get('/', (req, res) =>  {
+  res.render("index", {u : req.cookies.utilizator});
+});
 
 const listaIntrebari = [
   {
@@ -42,6 +46,32 @@ app.get('/chestionar', (req, res) => {
 	// în fișierul views/chestionar.ejs este accesibilă variabila 'intrebari' care conține vectorul de întrebări
 	res.render('chestionar', {intrebari: listaIntrebari});
 });
+
+app.get("/autentificare", (req, res) => {
+  if(req.cookies.utilizator == null)
+    res.render("autentificare", {err : req.cookies.errMsg});
+  else
+    res.redirect("/");
+})
+
+app.get("/delogare", (req, res) => {
+  res.clearCookie("utilizator");
+  res.redirect("/");
+})
+
+app.post("/verificare-autentificare", (req, res) => {
+  if(req.body["name"] == "Gabi" && req.body["password"] == "123")
+  {
+    res.cookie("utilizator", "Gabi");
+    res.clearCookie("errMsg");
+    res.redirect("/");
+  }
+  else
+  {
+    res.cookie("errMsg", "Utilizator sau parola gresita!");
+    res.redirect("autentificare");
+  }
+})
 
 app.post('/rezultat-chestionar', (req, res) => {
   console.log(req.body);

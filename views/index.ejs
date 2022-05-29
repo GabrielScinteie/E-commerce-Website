@@ -7,6 +7,8 @@ Bine ai venit, <%= u %>
 <a href = "autentificare"> Autentificare </a> <br>
 <% } %>
 
+<a href = "chestionar"> Chestionar</a>
+
 <!--
 <a href = "creare-bd"> Creare BD </a> <br>
 <a href = "inserare-bd"> Inserare BD </a> <br>
@@ -42,9 +44,17 @@ Bine ai venit, <%= u %>
 %>
 </table>
 
+<% if(u != null && tip == "admin") {%>
+    <br> <a href = "admin"> Adauga produse in stoc</a>
+<%} %>
+
 <% if(u != null ){ %>
     <br> <a href = "vizualizare-cos"> Vizualizare Cos</a> <br>
-    <% } %>
+    <% } 
+%>
+
+
+
 
 
 

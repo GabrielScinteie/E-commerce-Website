@@ -3,6 +3,7 @@ const expressLayouts = require('express-ejs-layouts');
 const bodyParser = require('body-parser')
 const cookieParser=require('cookie-parser');
 const session = require('express-session');
+const requestIp = require('request-ip');
 
 const app = express();
 app.use(cookieParser())
@@ -28,16 +29,33 @@ app.use(bodyParser.json());
 // utilizarea unui algoritm de deep parsing care suportă obiecte în obiecte
 app.use(bodyParser.urlencoded({ extended: true }));
 
+produse = []
+
+
+function checkBlacklist(req, res) {
+  let clientIp = requestIp.getClientIp(req);
+  console.log(clientIp)
+  if(req.session.blockedIp != null){
+      if(req.session.blockedIp.includes(clientIp)){
+          res.send('Prea multe incercari de accesare a resurselor inexistente! IP blocat temporar!')
+          return true
+      }
+  }
+  return false
+}
+
 
 // la accesarea din browser adresei http://localhost:6789/ se va returna textul 'Hello World'
 // proprietățile obiectului Request - req - https://expressjs.com/en/api.html#req
 // proprietățile obiectului Response - res - https://expressjs.com/en/api.html#res
 app.get('/', (req, res) =>  {
+  checkBlacklist(req, res)
   myBD.all(`
   select product_id, name, price
   from product;
   `, (err,rows) => {
-     res.render("index", {u : req.session.utilizator, products : rows});
+    produse = rows
+     res.render("index", {u : req.session.utilizator, tip : req.session.tip, products : rows});
   })
   
 });
@@ -67,17 +85,47 @@ app.get('/inserare-bd', (req,res) =>{
 })
 
 app.post('/adaugare_cos', (req, res) => {
-  sess = req.session
-  sess.arrayOfProducts = sess.arrayOfProducts || [];
-  sess.arrayOfProducts.push(req.body.id)
-  console.log(sess.arrayOfProducts)
+  checkBlacklist(req, res)
+  if(req.session.cumparaturi == null)
+    req.session.cumparaturi = []
+  if(req.session.cumparaturi[req.body.id] != null)
+    req.session.cumparaturi[req.body.id] = req.session.cumparaturi[req.body.id] + 1
+  else
+    req.session.cumparaturi[req.body.id] = 1
   res.redirect('/')
 })
 
+app.post('/adaugare_produs', (req, res) =>{
+  //console.log("Nume: " + req.body.name + "\nCantitate: " + req.body.price)
+  //res.send("Nume: " + req.body.name + "\nCantitate: " + req.body.price)
+  let name = req.body.name
+  let price = req.body.price
+  let myBD = new sqlite3.Database('./cumparaturi.db', (err) => {
+    if(err) {
+        console.log(err.message);
+        return;
+    }
+  });
+
+  myBD.all(`SELECT MAX(product_id) AS maxID FROM product`, (err, data) => {
+    if(err) {
+        return console.log(err.message); 
+    }
+    let maxId = data[0].maxID
+    myBD.run(`INSERT INTO product(product_id, name, price) VALUES (?, ?, ?)`, [maxId + 1, name, price], (err) => {
+        if(err) {
+            return console.log(err.message); 
+        }
+        console.log('Adaugare reusita!');
+        res.redirect('/')
+    })
+  })
+})
 
 
 // la accesarea din browser adresei http://localhost:6789/chestionar se va apela funcția specificată
 app.get('/chestionar', (req, res) => {
+  checkBlacklist(req, res)
 	fs.readFile('intrebari.json', (err, content) => {
     if(err) throw err;
     let intrebari = JSON.parse(content);
@@ -87,6 +135,7 @@ app.get('/chestionar', (req, res) => {
 });
 
 app.get("/autentificare", (req, res) => {
+  checkBlacklist(req, res)
   if(req.cookies.utilizator == null)
     res.render("autentificare", {err : req.cookies.errMsg});
   else
@@ -94,13 +143,20 @@ app.get("/autentificare", (req, res) => {
 })
 
 app.get('/vizualizare-cos', (req, res) =>{
+  checkBlacklist(req, res)
   if(req.session.utilizator != null)
   {
-    res.render("vizualizare-cos", {products : req.session.arrayOfProducts})
+    myBD.all(`
+    select name
+    from product;
+    `, (err,rows) => {
+      res.render("vizualizare-cos", {products: rows, quantities : req.session.cumparaturi})
+    })
   }
 })
 
 app.get("/delogare", (req, res) => {
+  checkBlacklist(req, res)
   req.session.destroy();
   res.redirect("/");
 })
@@ -115,6 +171,7 @@ app.post("/verificare-autentificare", (req, res) => {
         sess = req.session
         console.log(sess);
         sess.utilizator = req.body.name;
+        sess.tip = utilizatori[i].tip
         console.log(sess.name);
         res.clearCookie("errMsg");
         res.redirect("/");
@@ -125,6 +182,14 @@ app.post("/verificare-autentificare", (req, res) => {
   res.cookie("errMsg", "Utilizator sau parola gresita!");
   res.redirect("/autentificare");
   
+})
+
+app.get('/admin', (req,res) => {
+  checkBlacklist(req, res)
+  if(req.session.tip != 'admin')
+    res.redirect("/")
+  //res.send("Bine ai venit pe pagina de admin, " + req.session.utilizator)
+  res.render("admin")
 })
 
 app.post('/rezultat-chestionar', (req, res) => {
@@ -141,6 +206,26 @@ app.post('/rezultat-chestionar', (req, res) => {
   })
   
 	// res.send("formular: " + JSON.stringify(req.body));
+});
+
+app.get('*', function(req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  if(req.session.accessCounter == null){
+      req.session.accessCounter = 1
+  }
+  else{
+      req.session.accessCounter++
+  }
+  console.log(req.session.accessCounter)
+  if(req.session.accessCounter > 5){
+      req.session.blockedIp = req.session.blockedIp || []; 
+      let clientIp = requestIp.getClientIp(req);
+      if(!req.session.blockedIp.includes(clientIp)){
+          req.session.blockedIp.push(clientIp)
+      }
+  }
+  res.send('Error 404! Page not found!')
 });
 
 app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:`));

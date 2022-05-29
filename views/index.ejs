@@ -1,8 +1,51 @@
 <% if(u != null ){ %>
 Bine ai venit, <%= u %>
-<br> <a href = "delogare"> Delogare</a>
+<br> <a href = "delogare"> Delogare</a> <br>
 <%}
     else {    
 %>
-<a href = "autentificare"> Autentificare </a>
+<a href = "autentificare"> Autentificare </a> <br>
 <% } %>
+
+<!--
+<a href = "creare-bd"> Creare BD </a> <br>
+<a href = "inserare-bd"> Inserare BD </a> <br>
+-->
+
+<br>
+<table style = "border: 1px solid green">
+    <tr>
+        <td> <b> ID </b></td>
+        <td> <b> Nume </b></td>
+        <td> <b> Pret </b> </td> 
+    </tr>
+    <% for(var i = 0; i < products.length; i++){ %>
+        <tr>
+            <td> <%= products[i].product_id %> </td>
+            <td> <%= products[i].name %> </td>
+            <td> <%= products[i].price %> </td>
+            <td>
+            <% 
+                if(u != null)
+                {
+            %>
+            <form action = "adaugare_cos" method = "POST">
+                <input type = "hidden" name = "id" value = <%= i %>>
+                <input type = "submit" value = "Adauga">
+            </form>
+            
+            <% } %>
+            </td>
+        </tr>
+    <% 
+    }
+%>
+</table>
+
+<% if(u != null ){ %>
+    <br> <a href = "vizualizare-cos"> Vizualizare Cos</a> <br>
+    <% } %>
+
+
+
+

@@ -1,0 +1,15 @@
+<br>
+<table style = "border: 1px solid green">
+    <tr>
+        <td> <b> ID </b></td>
+        <td> <b> Nume </b></td>
+        <td> <b> Pret </b> </td> 
+    </tr>
+    <% for(var i = 0; i < products.length; i++){ %>
+        <tr>
+            <td> <%= products[i].id %> </td>
+        </tr>
+    <% 
+    }
+%>
+</table>

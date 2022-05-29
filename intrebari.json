@@ -1,0 +1,13 @@
+[
+    {
+      "intrebare": "Vrei punct din oficiu?",
+      "variante": ["Da", "Nu", "Poate", "Se poate doua?"],
+      "corect": 3
+    },
+    {
+      "intrebare": "Ce faci?",
+      "variante": ["Bine", "Bine, tu?", "Nimic", "Seen"],
+      "corect": 1
+    }
+]
+  

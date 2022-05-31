@@ -1,13 +1,17 @@
 <% if(u != null ){ %>
-Bine ai venit, <%= u %>
-<br> <a href = "delogare"> Delogare</a> <br>
+<p id = "welcome">Bine ai venit, <%= u %>!</p>
+<div id = "delogare">
+    <a style = "text-align: right;" href = "delogare"> Delogare</a> <br>
+</div>
 <%}
     else {    
 %>
-<a href = "autentificare"> Autentificare </a> <br>
+<div id = "autentificare">
+    <a style = "text-align:right;" href = "autentificare"> Autentificare </a> <br>
+</div>
+
 <% } %>
 
-<a href = "chestionar"> Chestionar</a>
 
 <!--
 <a href = "creare-bd"> Creare BD </a> <br>
@@ -15,15 +19,13 @@ Bine ai venit, <%= u %>
 -->
 
 <br>
-<table style = "border: 1px solid green">
+<table id = "products" style = "border: 1px solid green">
     <tr>
-        <td> <b> ID </b></td>
-        <td> <b> Nume </b></td>
-        <td> <b> Pret </b> </td> 
+        <td style = "font-weight: bold; font-size: 30px;"> <b> Nume </b></td>
+        <td style = "font-weight: bold; font-size: 30px;"> <b> Pret </b> </td> 
     </tr>
     <% for(var i = 0; i < products.length; i++){ %>
         <tr>
-            <td> <%= products[i].product_id %> </td>
             <td> <%= products[i].name %> </td>
             <td> <%= products[i].price %> </td>
             <td>
@@ -31,7 +33,7 @@ Bine ai venit, <%= u %>
                 if(u != null)
                 {
             %>
-            <form action = "adaugare_cos" method = "POST">
+            <form id = "adaugaProdusForm"action = "adaugare_cos" method = "POST">
                 <input type = "hidden" name = "id" value = <%= i %>>
                 <input type = "submit" value = "Adauga">
             </form>
@@ -44,14 +46,21 @@ Bine ai venit, <%= u %>
 %>
 </table>
 
-<% if(u != null && tip == "admin") {%>
-    <br> <a href = "admin"> Adauga produse in stoc</a>
-<%} %>
+<div id = "adaugareProduse">
+    <% if(u != null && tip == "admin") {%>
+        <br> <a href = "admin"> Adauga produse in stoc</a>
+    <%} %>
+</div>
 
-<% if(u != null ){ %>
-    <br> <a href = "vizualizare-cos"> Vizualizare Cos</a> <br>
-    <% } 
-%>
+
+
+<div id = "vizualizareCos">
+    <% if(u != null ){ %>
+        <a href = "vizualizare-cos"> Vizualizare Cos</a>
+        <% } 
+    %>
+</div>
+
 
 
 

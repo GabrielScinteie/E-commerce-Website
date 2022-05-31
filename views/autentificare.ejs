@@ -1,11 +1,17 @@
-<% if(err != null ){ %>
-<%= err %>    
-<% } %>
+<fieldset id = "fieldsetFormularAutentificare">
+    <p id = "introduDate"> Introdu numele și parola:</p>
+    <form id ="formAutentificare" action = "/verificare-autentificare" method = "post">
+        <label> Nume: </label>
+        <input type = "text" name = "name"> <br>
+        <label style = "margin-right: 3.5px;"> Parolă: </label>
+        <input type = "password" name = "password"> <br>
+        <input id = "submitButton" type = "submit" value = "Loghează-te">
+    </form>
+</fieldset>
 
-<form action = "/verificare-autentificare" method = "post">
-    <label> Nume: </label>
-    <input type = "text" name = "name"> <br>
-    <label> Parola: </label>
-    <input type = "password" name = "password"> <br>
-    <input type = "submit" value = "Submit">
-</form>
+
+
+
+<% if(err != null ){ %>
+<p id = "mesajEroare"> <%= err %> </p>    
+<% } %>

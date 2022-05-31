@@ -1,10 +1,12 @@
 <br>
-<table style = "border: 1px solid green">
+<table id = "products" style = "border: 1px solid green">
     <tr>
         <td> <b> Nume </b></td>
         <td> <b> Cantitate </b> </td> 
     </tr>
-    <% if(quantities != null) {%>
+    <% console.log(products) %>
+    <% console.log(quantities) %>
+    <% if(quantities != null && products != null) {%>
         <% for(var i = 0; i < quantities.length; i++){ %>
             <% if(quantities[i] != null) {%>
                 <tr>

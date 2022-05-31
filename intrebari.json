@@ -1,13 +1,35 @@
 [
     {
-      "intrebare": "Vrei punct din oficiu?",
-      "variante": ["Da", "Nu", "Poate", "Se poate doua?"],
-      "corect": 3
+      "intrebare": "Un monitor cu o rezoluție mai bună afectează calitatea imaginii într-un mod: ",
+      "variante": ["Pozitiv", "Negativ", "Nu o afectează", "Nu știu"],
+      "corect": 1
     },
     {
-      "intrebare": "Ce faci?",
-      "variante": ["Bine", "Bine, tu?", "Nimic", "Seen"],
+      "intrebare": "Un mouse cu un DPI mai mare se mișcă:",
+      "variante": ["Mai încet", "Mai rapid", "Nu au legătură", "Nu știu"],
+      "corect": 2
+    },
+    {
+      "intrebare": "Tastatura este un dispozitiv periferic de:",
+      "variante": ["Intrare", "Ieșire", "Mediere", "Intervenție"],
       "corect": 1
+    },
+    {
+      "intrebare": "Monitorul este un dispozitiv periferic de:",
+      "variante": ["Intrare", "Ieșire", "Mediere", "Intervenție"],
+      "corect": 2
+    },
+    {
+      "intrebare": "Dispozitivele de intrare sunt acele dispozitive cu ajutorul cărora:",
+      "variante": ["Calculatorul transmite informații către utilizator", "Utilizatorul transmite informații către calculator", "Utilizatorul se conectează la internet", 
+        "Calculatorul funcționează normal"],
+      "corect": 2
+    },
+    {
+      "intrebare": "Cea mai mică unitate de măsură a informației este:",
+      "variante": ["0", "1", "Bit-ul", "Byte-ul"],
+      "corect": 3
     }
+    
 ]
   

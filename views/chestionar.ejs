@@ -1,12 +1,17 @@
-<form action = "/rezultat-chestionar" method = "post">
-    <% for(let i in intrebari){ let c = 0; %>
-    <p> <%= intrebari[i].intrebare %> </p>
-    <% for(const v of intrebari[i].variante){ %>
-    <input type = "radio" name = "q<%= i %>" value = "<%= c++%>"/>
-    <label> <%= v%> </label> <br>
-    <% 
+<fieldset id = "fieldsetChestionar">
+    <form action = "/rezultat-chestionar" method = "post">
+        <% for(let i in intrebari){ let c = 0, j = parseInt(i) + 1; %>
+        <p> <%= j%>. <%= intrebari[i].intrebare %> </p>
+        <% for(const v of intrebari[i].variante){ %>
+        <input type = "radio" name = "q<%= i %>" value = "<%= c++%>"/>
+        <label> <%= v%> </label> <br>
+        <% 
+            } %>
+        <br> <br>
+        <%    
         }
-    }
-    %>
-    <button type = "submit"> Submit </button>
-</form>
+        %>
+        <button type = "submit"> Submit </button>
+    </form>
+</fieldset>
+

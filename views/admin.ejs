@@ -1,7 +1,10 @@
- <form action = "/adaugare_produs" method = "post">
-    <label> Nume: </label>
-    <input type = "text" name = "name"> <br>
-    <label> Pret: </label>
-    <input type = "number" name = "price"> <br>
-    <input type = "submit" value = "Adauga">
-</form>
+ <fieldset id = "fieldsetAdmin">
+    <p id = "introduDate"> Introdu detaliile produsului:</p>
+    <form id = "formAdmin" action = "/adaugare_produs" method = "post">
+        <label> Nume: </label>
+        <input type = "text" name = "name"> <br>
+        <label style = "margin-right: 18.5px;"> Preț: </label>
+        <input type = "number" name = "price"> <br>
+        <input id = "submitButton" type = "submit" value = "Adauga">
+    </form>
+ </fieldset>

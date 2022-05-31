@@ -30,7 +30,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 produse = []
-
+attempts = {} // dictionar ce va avea ca si cheie IP-ul, iar ca si valoare numarul de incercari
+bannedTimeStamp = {} // dictionar ce va avea ca si cheie IP-ul, iar ca si valoarea momentul blocarii
+// se va considera o perioada de ban de 30 minute
 
 function checkBlacklist(req, res) {
   let clientIp = requestIp.getClientIp(req);
@@ -136,10 +138,59 @@ app.get('/chestionar', (req, res) => {
 
 app.get("/autentificare", (req, res) => {
   checkBlacklist(req, res)
-  if(req.cookies.utilizator == null)
-    res.render("autentificare", {err : req.cookies.errMsg});
+  ip = requestIp.getClientIp(req)
+  
+  if(ip in bannedTimeStamp)
+  {
+    console.log(bannedTimeStamp[ip])
+    console.log(Date.now())   
+    if(bannedTimeStamp[ip] + 10000 > Date.now())
+      res.send("Logarea esuata de prea multe ori! Asteapta 10 secunde!");
+    else
+      delete bannedTimeStamp[ip]
+      attempts[ip] = 0
+      req.session.errMsg = null;
+  }
+
+  if(req.session.utilizator == null)
+    res.render("autentificare", {err : req.session.errMsg});
   else
     res.redirect("/");
+})
+
+app.post("/verificare-autentificare", (req, res) => {
+  for(let i in utilizatori)
+  {
+    if(req.body["name"] == utilizatori[i].utilizator && req.body["password"] == utilizatori[i].parola)
+    {
+        sess = req.session
+        console.log(sess);
+        sess.utilizator = req.body.name;
+        sess.tip = utilizatori[i].tip
+        console.log(sess.name);
+        req.session.errMsg = null;
+        res.redirect("/");
+        return;
+    }
+  }
+    
+  req.session.errMsg = "Utilizator sau parola greșită!";
+  ip = requestIp.getClientIp(req)
+  if(ip in attempts)
+  {
+    attempts[ip] = attempts[ip] + 1
+    if(attempts[ip] > 5)
+    {
+      bannedTimeStamp[ip] = Date.now()
+    }
+  }
+  else
+  {
+    attempts[ip] = 1;
+  }
+
+  //console.log(attempts[ip])
+  res.redirect("/autentificare");
 })
 
 app.get('/vizualizare-cos', (req, res) =>{
@@ -163,26 +214,7 @@ app.get("/delogare", (req, res) => {
 
 let utilizatori = JSON.parse(fs.readFileSync('utilizatori.json'));
 
-app.post("/verificare-autentificare", (req, res) => {
-  for(let i in utilizatori)
-  {
-    if(req.body["name"] == utilizatori[i].utilizator && req.body["password"] == utilizatori[i].parola)
-    {
-        sess = req.session
-        console.log(sess);
-        sess.utilizator = req.body.name;
-        sess.tip = utilizatori[i].tip
-        console.log(sess.name);
-        res.clearCookie("errMsg");
-        res.redirect("/");
-        return;
-    }
-  }
-    
-  res.cookie("errMsg", "Utilizator sau parola gresita!");
-  res.redirect("/autentificare");
-  
-})
+
 
 app.get('/admin', (req,res) => {
   checkBlacklist(req, res)
@@ -199,7 +231,7 @@ app.post('/rezultat-chestionar', (req, res) => {
     let nrCorecte = 0
     for(i in intrebari)
     {
-      if(req.body[`q${i}`] == intrebari[i].corect)
+      if(parseInt(req.body[`q${i}`]) + 1 == parseInt(intrebari[i].corect))
         nrCorecte++;
     }
     res.render("rezultat-chestionar", {punctaj: nrCorecte});
@@ -208,9 +240,9 @@ app.post('/rezultat-chestionar', (req, res) => {
 	// res.send("formular: " + JSON.stringify(req.body));
 });
 
-app.get('*', function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
+
+app.use(function(req, res) {
+  res.statusCode = 404;
   if(req.session.accessCounter == null){
       req.session.accessCounter = 1
   }

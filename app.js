@@ -34,6 +34,7 @@ attempts = {} // dictionar ce va avea ca si cheie IP-ul, iar ca si valoare numar
 bannedTimeStamp = {} // dictionar ce va avea ca si cheie IP-ul, iar ca si valoarea momentul blocarii
 // se va considera o perioada de ban de 30 minute
 
+// verifica daca ip-ul curent este in lista de ip-uri blocate
 function checkBlacklist(req, res) {
   let clientIp = requestIp.getClientIp(req);
   console.log(clientIp)
@@ -46,10 +47,10 @@ function checkBlacklist(req, res) {
   return false
 }
 
+var myBD = new sqlite3.Database('./cumparaturi.db', sqlite3.OPEN_READWRITE)
+let utilizatori = JSON.parse(fs.readFileSync('utilizatori.json'));  
 
-// la accesarea din browser adresei http://localhost:6789/ se va returna textul 'Hello World'
-// proprietățile obiectului Request - req - https://expressjs.com/en/api.html#req
-// proprietățile obiectului Response - res - https://expressjs.com/en/api.html#res
+
 app.get('/', (req, res) =>  {
   checkBlacklist(req, res)
   myBD.all(`
@@ -59,10 +60,8 @@ app.get('/', (req, res) =>  {
     produse = rows
      res.render("index", {u : req.session.utilizator, tip : req.session.tip, products : rows});
   })
-  
 });
 
-var myBD = new sqlite3.Database('./cumparaturi.db', sqlite3.OPEN_READWRITE)
 
 app.get('/creare-bd', (req, res) => {
   myBD = new sqlite3.Database('./cumparaturi.db', (err) => {
@@ -145,7 +144,7 @@ app.get("/autentificare", (req, res) => {
     console.log(bannedTimeStamp[ip])
     console.log(Date.now())   
     if(bannedTimeStamp[ip] + 10000 > Date.now())
-      res.send("Logarea esuata de prea multe ori! Asteapta 10 secunde!");
+      res.send("Logarea eșuată de prea multe ori! Așteaptă 10 secunde!");
     else
       delete bannedTimeStamp[ip]
       attempts[ip] = 0
@@ -212,10 +211,6 @@ app.get("/delogare", (req, res) => {
   res.redirect("/");
 })
 
-let utilizatori = JSON.parse(fs.readFileSync('utilizatori.json'));
-
-
-
 app.get('/admin', (req,res) => {
   checkBlacklist(req, res)
   if(req.session.tip != 'admin')
@@ -257,7 +252,7 @@ app.use(function(req, res) {
           req.session.blockedIp.push(clientIp)
       }
   }
-  res.send('Error 404! Page not found!')
+  res.send('Resursă inexistentă!');
 });
 
 app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:`));

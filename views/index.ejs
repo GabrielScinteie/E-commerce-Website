@@ -22,7 +22,7 @@
 <table id = "products" style = "border: 1px solid green">
     <tr>
         <td style = "font-weight: bold; font-size: 30px;"> <b> Nume </b></td>
-        <td style = "font-weight: bold; font-size: 30px;"> <b> Pret </b> </td> 
+        <td style = "font-weight: bold; font-size: 30px;"> <b> Preț </b> </td> 
     </tr>
     <% for(var i = 0; i < products.length; i++){ %>
         <tr>
@@ -35,7 +35,7 @@
             %>
             <form id = "adaugaProdusForm"action = "adaugare_cos" method = "POST">
                 <input type = "hidden" name = "id" value = <%= i %>>
-                <input type = "submit" value = "Adauga">
+                <input type = "submit" value = "Adaugă">
             </form>
             
             <% } %>
